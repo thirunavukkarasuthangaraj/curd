@@ -1,0 +1,24 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    paths:
+      - 'angular-frontend/**'  # Runs only if frontend code changes
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies & build
+        run: |
+          cd angular-frontend
+          npm install
+          npm run build
