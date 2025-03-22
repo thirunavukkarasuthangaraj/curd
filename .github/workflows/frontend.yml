@@ -1,15 +1,16 @@
-name: Frontend CI/CD
+name: Deploy Angular to S3
 
 on:
   push:
     paths:
-      - 'angular-frontend/**'  # Runs only if frontend code changes
+      - 'angular-frontend/**'  # Runs only when Angular files change
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Setup Node.js
@@ -17,8 +18,19 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies & build
+      - name: Install dependencies & Build
         run: |
           cd angular-frontend
           npm install
-          npm run build
+          npm run build --configuration=production
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1  # Change if your region is different
+
+      - name: Upload to S3
+        run: |
+          aws s3 sync angular-frontend/dist/ s3://angularcrudthiru --delete
