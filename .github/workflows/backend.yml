@@ -3,7 +3,7 @@ name: Deploy Spring Boot to AWS EC2
 on:
   push:
     paths:
-      - 'springboot-backend/**'  # Runs only when backend files change
+      - 'springboot-backend/**'   
 
 jobs:
   build-and-deploy:
@@ -24,13 +24,24 @@ jobs:
           cd springboot-backend
           mvn clean install -DskipTests
 
+      - name: Debug - Check JAR File
+        run: |
+          ls -l springboot-backend/target/
+
+      - name: Save EC2 SSH Key
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key1.pem
+          chmod 600 ec2_key1.pem  # Set proper permissions
+
       - name: Transfer JAR to EC2
         run: |
-          scp -i ${{ secrets.EC2_SSH_KEY }} springboot-backend/target/*.jar ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/app.jar
+          echo "Copying JAR to EC2..."
+          scp -o StrictHostKeyChecking=no -i ec2_key1.pem springboot-backend/target/*.jar ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/app.jar
 
       - name: Restart Application on EC2
         run: |
-          ssh -i ${{ secrets.EC2_SSH_KEY }} ubuntu@${{ secrets.EC2_PUBLIC_IP }} <<EOF
+          echo "Restarting application..."
+          ssh -o StrictHostKeyChecking=no -i ec2_key1.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} <<EOF
             sudo kill -9 $(lsof -t -i:8080) || true
             nohup java -jar /home/ubuntu/app.jar > /home/ubuntu/app.log 2>&1 &
           EOF
