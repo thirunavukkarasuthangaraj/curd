@@ -39,7 +39,7 @@ jobs:
           scp -o StrictHostKeyChecking=no -i ec2_key.pem springboot-backend/target/springboot-backend-0.0.1-SNAPSHOT.jar ubuntu@${{ secrets.EC2_PUBLIC_IP }}:/home/ubuntu/app.jar
 
       - name: Restart Application on EC2
-        run: |
+        run: | 
           echo "Restarting application..."
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@${{ secrets.EC2_PUBLIC_IP }} <<EOF
             sudo kill -9 $(lsof -t -i:8080) || true
