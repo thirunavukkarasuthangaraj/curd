@@ -31,12 +31,12 @@ jobs:
       run: |
         aws s3 sync angular-frontend/dist s3://${{ secrets.S3_UI_BUCKET }}
 
-    - name: SSH to EC2 and Deploy UI
+    - name: SSH to EC2 and Deploy UI 
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }} 
         script: |
           sudo rm -rf /var/www/html/*
           aws s3 cp s3://${{ secrets.S3_UI_BUCKET }}/ /var/www/html/ --recursive
