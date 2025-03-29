@@ -3,12 +3,12 @@ name: Angular UI CI/CD
 on:
   push:
     branches:
-      - main  # Change this if your branch is different
+      - main  # Adjust branch if needed
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,7 +26,9 @@ jobs:
         working-directory: angular-frontend  # Adjust if needed
 
       - name: Build Angular App
-        run: ng build --configuration=production
+        run: |
+          export NODE_OPTIONS=--openssl-legacy-provider
+          ng build --configuration=production
         working-directory: angular-frontend
 
       - name: Upload Build Artifacts
@@ -40,7 +42,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # North Virginia (your region)
+          aws-region: us-east-1  # North Virginia
 
       - name: Deploy to S3
         run: aws s3 sync angular-frontend/dist/angular-frontend s3://angular-ui-deployment-bucket --delete
