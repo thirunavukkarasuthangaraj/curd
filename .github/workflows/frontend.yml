@@ -1,52 +1,37 @@
-name: Angular UI CI/CD
+name: Deploy Angular UI
 
 on:
   push:
     branches:
-      - main  # Adjust branch if needed
+      - main  # Change if using a different branch
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 16
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18  # Use the latest stable version
 
-      - name: Install Angular CLI
-        run: npm install -g @angular/cli@12.1.3
+      - name: Install dependencies
+        run: npm install
 
-      - name: Install Dependencies
-        run: npm ci
-        working-directory: angular-frontend  # Adjust if needed
+      - name: Build Angular app
+        run: npm run build --if-present
 
-      - name: Build Angular App
-        run: |
-          export NODE_OPTIONS=--openssl-legacy-provider
-          ng build --configuration=production
-        working-directory: angular-frontend
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: angular-build
-          path: angular-frontend/dist
-
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # North Virginia
+          aws-region: "us-east-1"  # 🔹 Ensure this is your AWS region
 
       - name: Deploy to S3
-        run: aws s3 sync angular-frontend/dist/angular-frontend s3://angular-ui-deployment-bucket --delete
-
-      - name: Invalidate CloudFront Cache (Optional)
-        run: |
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+        run: aws s3 sync dist/angular-frontend/ s3://ui-thiru --delete
+        env:
+          AWS_REGION: "us-east-1"  # 🔹 Ensure this matches your region
