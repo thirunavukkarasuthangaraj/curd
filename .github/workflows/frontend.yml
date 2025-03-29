@@ -1,27 +1,57 @@
+name: Deploy UI to S3
+
+on:
+  push:
+    branches:
+      - main  # Change if using a different branch
+
 jobs:
-  build-and-deploy:
+  deploy-ui:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Enable Debug Mode
+        run: echo "Running with debug mode enabled"
+        
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Debug directory structure
+        run: ls -l
+
+      - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 16  # Adjust version if needed
+
+      - name: Debug NPM and Node Versions
+        run: |
+          node -v
+          npm -v
 
       - name: Install dependencies
-        run: npm install
-        working-directory: angular-frontend
-
-      - name: Build Angular app
-        run: npm run build --prod
-        working-directory: angular-frontend
-
-      - name: Deploy to S3
         run: |
-          aws s3 sync angular-frontend/dist/angular-frontend s3://ui-thiru --delete
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1  # Change to your correct AWS region
+          cd angular-frontend
+          npm install
+
+      - name: Build Angular App
+        run: |
+          cd angular-frontend
+          npm run build --prod
+
+      - name: Verify Build Output
+        run: ls -l angular-frontend/dist/
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1  # Change to your AWS region
+
+      - name: Upload to S3
+        run: |
+          aws s3 sync angular-frontend/dist/ s3://ui-thiru --delete
+
+      - name: Verify S3 Upload
+        run: aws s3 ls s3://ui-thiru --recursive
