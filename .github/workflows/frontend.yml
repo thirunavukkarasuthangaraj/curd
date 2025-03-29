@@ -1,36 +1,40 @@
-name: Deploy Angular to S3
+name: Deploy Angular UI
 
 on:
   push:
+    branches:
+      - main
     paths:
-      - 'angular-frontend/**'  # Runs only when Angular files change
+      - "angular-frontend/**"
 
 jobs:
-  build-and-deploy:
+  deploy-ui:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    - name: Install Dependencies & Build
+      run: |
+        cd angular-frontend
+        npm install
+        npm run build --prod
 
-      - name: Install dependencies & Build
-        run: |
-          cd angular-frontend
-          npm install
-          npm run build --configuration=production
+    - name: Upload UI to S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        aws s3 sync angular-frontend/dist s3://${{ secrets.S3_UI_BUCKET }}
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Change if your region is different
-
-      - name: Upload to S3
-        run: |
-          aws s3 sync angular-frontend/dist/ s3://angularcrudthiru --delete
+    - name: SSH to EC2 and Deploy UI
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        script: |
+          sudo rm -rf /var/www/html/*
+          aws s3 cp s3://${{ secrets.S3_UI_BUCKET }}/ /var/www/html/ --recursive
+          sudo systemctl restart nginx

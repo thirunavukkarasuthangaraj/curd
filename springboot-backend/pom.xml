@@ -36,6 +36,13 @@
 			<optional>true</optional>
 		</dependency>
 
+    <!-- Lombok (For Reducing Boilerplate Code) -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <scope>provided</scope>
+    </dependency>
+ 
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
