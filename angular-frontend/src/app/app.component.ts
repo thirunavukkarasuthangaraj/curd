@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import * as appPackage from '../../package.json';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,5 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Angular + Spring Boot CRUD Full Stack App';
-}
+  version = appPackage.version;
+ }
