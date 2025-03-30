@@ -51,7 +51,7 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 sync angular-frontend/dist/ s3://ui-thiru --delete
+          aws s3 sync angular-frontend/dist/angular-frontend s3://ui-thiru --delete
 
       - name: Verify S3 Upload
         run: aws s3 ls s3://ui-thiru --recursive
