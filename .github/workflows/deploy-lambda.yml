@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Change this if you use another branch
     paths:
-      - 'springboot-backend-lampda/**'  # Triggers only  if files inside this folder change
+      - 'springboot-backend-lampda/**'  # Triggers only if files inside this directory change
   workflow_dispatch:  # Allows manual execution from GitHub Actions
 
 jobs:
@@ -29,23 +29,21 @@ jobs:
 
       - name: Upload JAR to S3
         run: |
-          aws s3 cp springboot-backend-lampda/target/springboot-lambda-0.0.1-SNAPSHOT.jar s3://${{ secrets.S3_BUCKET_NAME }}/springboot-lambda.jar
+          aws s3 cp springboot-backend-lampda/target/springboot-lambda-0.0.1-SNAPSHOT.jar s3://lambdabackend-thiru/springboot-lambda.jar --region us-east-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
 
       - name: Deploy JAR to Lambda
         run: |
-          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ secrets.S3_BUCKET_NAME }} --s3-key springboot-lambda.jar
+          aws lambda update-function-code --function-name EmployeeLambdaHandler --s3-bucket lambdabackend-thiru --s3-key springboot-lambda.jar --region us-east-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
 
       - name: Verify Deployment
         run: |
-          aws lambda get-function-configuration --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }}
+          aws lambda get-function-configuration --function-name EmployeeLambdaHandler --region us-east-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
