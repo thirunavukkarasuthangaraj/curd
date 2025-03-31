@@ -2,10 +2,11 @@ name: Deploy Spring Boot Lambda to AWS
 
 on:
   push:
-    paths:
-      - 'lambda-backend/**'  # Adjust based on your project structure
     branches:
-      - main  # Change if using a different branch
+      - main  # Change this if you use another branch
+    paths:
+      - 'lambda/**'  # Triggers only if files inside lambda/ change
+  workflow_dispatch:  # Allows manual execution from GitHub Actions
 
 jobs:
   deploy:
@@ -23,12 +24,12 @@ jobs:
 
       - name: Build the JAR
         run: |
-          cd lambda-backend
+          cd lambda
           mvn clean package -DskipTests
 
       - name: Upload JAR to S3
         run: |
-          aws s3 cp lambda-backend/target/springboot-lambda-0.0.1-SNAPSHOT.jar s3://${{ secrets.S3_BUCKET_NAME }}/springboot-lambda.jar
+          aws s3 cp lambda/target/springboot-lambda-0.0.1-SNAPSHOT.jar s3://${{ secrets.S3_BUCKET_NAME }}/springboot-lambda.jar
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
