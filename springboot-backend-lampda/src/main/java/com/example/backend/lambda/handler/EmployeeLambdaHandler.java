@@ -1,4 +1,4 @@
-package com.example.lambda.handler;
+package com.example.backend.lambda.handler;
 
 import java.util.Map;
 
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.example.lambda.config.AppConfig;
-import com.example.lambda.model.Employee;
-import com.example.lambda.repository.EmployeeRepository;
+import com.example.backend.lambda.config.AppConfig;
+import com.example.backend.lambda.model.Employee;
+import com.example.backend.lambda.repository.EmployeeRepository;
 public class EmployeeLambdaHandler implements RequestHandler<Map<String, String>, String> {
 
     private ApplicationContext context;

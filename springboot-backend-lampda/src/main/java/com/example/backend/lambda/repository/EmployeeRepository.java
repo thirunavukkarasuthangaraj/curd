@@ -1,7 +1,8 @@
-package com.example.lambda.repository;
+package com.example.backend.lambda.repository;
 
-import com.example.lambda.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.backend.lambda.model.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 }

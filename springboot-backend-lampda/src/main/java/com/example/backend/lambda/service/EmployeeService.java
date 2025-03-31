@@ -1,7 +1,8 @@
-package com.example.lambda.service;
+package com.example.backend.lambda.service;
 
-import com.example.lambda.model.Employee;
-import com.example.lambda.repository.EmployeeRepository;
+import com.example.backend.lambda.model.Employee;
+import com.example.backend.lambda.repository.EmployeeRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package com.example.lambda.model;
+package com.example.backend.lambda.model;
 
 import javax.persistence.*;
 

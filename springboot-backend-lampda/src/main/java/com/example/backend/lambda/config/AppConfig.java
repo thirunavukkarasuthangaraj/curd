@@ -1,4 +1,4 @@
-package com.example.lambda.config;
+package com.example.backend.lambda.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
