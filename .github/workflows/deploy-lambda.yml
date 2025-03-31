@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Change this if you use another branch
     paths:
-      - 'lambda/**'  # Triggers only if files inside lambda/ change
+      - 'springboot-backend-lampda/**'  # Triggers only if files inside lambda/ change
   workflow_dispatch:  # Allows manual execution from GitHub Actions
 
 jobs:
