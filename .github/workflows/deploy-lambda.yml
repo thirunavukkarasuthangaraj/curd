@@ -23,7 +23,9 @@ jobs:
           java-version: '8'
 
       - name: Build the JAR
+         
         run: |
+          ls -R
           cd lambda
           mvn clean package -DskipTests
 
