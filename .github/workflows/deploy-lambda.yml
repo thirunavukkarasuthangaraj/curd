@@ -27,9 +27,17 @@ jobs:
           cd lambda
           mvn clean package -DskipTests
 
+      - name: Verify JAR File
+        run: |
+          if [ ! -f "lambda/target/springboot-lambda-0.0.1-SNAPSHOT.jar" ]; then
+            echo "Error: JAR file not found!"
+            exit 1
+          fi
+          echo "JAR file exists. Proceeding to upload."
+
       - name: Upload JAR to S3
         run: |
-          aws s3 cp lambda/target/springboot-lambda-0.0.1-SNAPSHOT.jar s3://${{ secrets.S3_BUCKET_NAME }}/springboot-lambda.jar
+          aws s3 sync lambda/target/ s3://${{ secrets.S3_BUCKET_NAME }}/ --exclude "*" --include "springboot-lambda-0.0.1-SNAPSHOT.jar"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -37,15 +45,18 @@ jobs:
 
       - name: Deploy JAR to Lambda
         run: |
-          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ secrets.S3_BUCKET_NAME }} --s3-key springboot-lambda.jar
+          aws lambda update-function-code \
+            --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} \
+            --s3-bucket ${{ secrets.S3_BUCKET_NAME }} \
+            --s3-key springboot-lambda-0.0.1-SNAPSHOT.jar || { echo "Lambda deployment failed!"; exit 1; }
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      - name: Verify Deployment
+      - name: Verify Deployment & Check Lambda Version
         run: |
-          aws lambda get-function-configuration --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }}
+          aws lambda get-function-configuration --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --query 'Version' --output text
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
