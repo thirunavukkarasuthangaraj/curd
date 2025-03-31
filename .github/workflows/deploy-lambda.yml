@@ -1,11 +1,12 @@
-name: Deploy Spring Boot Lambda to AWS
+name: Deploy Spring Boot Lambda to AWS 
 
 on:
   push:
     branches:
       - main  # Change this if you use another branch
     paths:
-      - 'springboot-backend-lampda/**'  # Triggers only if files inside this directory change
+     - 'springboot-backend-lampda/**'
+
   workflow_dispatch:  # Allows manual execution from GitHub Actions
 
 jobs:
