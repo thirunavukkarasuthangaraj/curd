@@ -1,60 +1,52 @@
-name: Deploy UI to S3
+name: Deploy Spring Boot Lambda to AWS
 
 on:
   push:
     branches:
-      - main
+      - main  # Change this if you use another branch
     paths:
-      - 'angular-frontend/**'  # Trigger only if UI files change
-  workflow_dispatch:  # Allows manual execution
+      - 'springboot-backend-lampda/**'  # Triggers only if files inside this folder change
+  workflow_dispatch:  # Allows manual execution from GitHub Actions
 
 jobs:
-  deploy-ui:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Enable Debug Mode
-        run: echo "Running with debug mode enabled"
-        
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Debug directory structure
-        run: ls -l
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
+      - name: Set Up JDK 8
+        uses: actions/setup-java@v3
         with:
-          node-version: 16  # Adjust version if needed
+          distribution: 'temurin'
+          java-version: '8'
 
-      - name: Debug NPM and Node Versions
+      - name: Build the JAR
         run: |
-          node -v
-          npm -v
+          cd springboot-backend-lampda
+          mvn clean package -DskipTests
 
-      - name: Install dependencies
+      - name: Upload JAR to S3
         run: |
-          cd angular-frontend
-          npm install
+          aws s3 cp springboot-backend-lampda/target/springboot-lambda-0.0.1-SNAPSHOT.jar s3://${{ secrets.S3_BUCKET_NAME }}/springboot-lambda.jar
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      - name: Build Angular App
+      - name: Deploy JAR to Lambda
         run: |
-          cd angular-frontend
-          npm run build --prod
+          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }} --s3-bucket ${{ secrets.S3_BUCKET_NAME }} --s3-key springboot-lambda.jar
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
-      - name: Verify Build Output
-        run: ls -l angular-frontend/dist/
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1  # Change to your AWS region
-
-      - name: Upload to S3
+      - name: Verify Deployment
         run: |
-          aws s3 sync angular-frontend/dist/angular-frontend s3://ui-thiru --delete
-
-      - name: Verify S3 Upload
-        run: aws s3 ls s3://ui-thiru --recursive
+          aws lambda get-function-configuration --function-name ${{ secrets.LAMBDA_FUNCTION_NAME }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
