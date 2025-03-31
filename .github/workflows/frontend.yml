@@ -5,7 +5,7 @@ on:
     branches:
       - main  # Change this if you use another branch
     paths:
-      - 'springboot-backend-lampda/**'  # Triggers only if files inside this folder change
+      - 'angular-frontend/**'  # Triggers only if files inside this folder change
   workflow_dispatch:  # Allows manual execution from GitHub Actions
 
 jobs:
