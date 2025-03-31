@@ -9,7 +9,7 @@ on:
 
   workflow_dispatch:  # Allows manual execution from GitHub Actions
 
-  jobs:
+jobs:
   deploy:
     runs-on: ubuntu-latest
 
