@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Map;
 
 public class EmployeeHandler implements RequestHandler<Map<String, String>, String> {
@@ -22,18 +23,24 @@ public class EmployeeHandler implements RequestHandler<Map<String, String>, Stri
 
         System.out.println("Received Employee Data: " + firstName + ", " + lastName + ", " + emailId);
 
-        // Update the database
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String updateQuery = "UPDATE employees SET first_name = ?, last_name = ? WHERE email_id = ?";
-            try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-                statement.setString(1, firstName);
-                statement.setString(2, lastName);
-                statement.setString(3, emailId);
-                
-                int rowsUpdated = statement.executeUpdate();
+            // Step 1: Check if employee exists
+            String checkQuery = "SELECT COUNT(*) FROM employees WHERE email_id = ?";
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                checkStmt.setString(1, emailId);
+                ResultSet resultSet = checkStmt.executeQuery();
 
-                if (rowsUpdated > 0) {
-                    return "Employee updated successfully: " + firstName + " " + lastName;
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    // Employee exists, proceed with update
+                    String updateQuery = "UPDATE employees SET first_name = ?, last_name = ? WHERE email_id = ?";
+                    try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+                        updateStmt.setString(1, firstName);
+                        updateStmt.setString(2, lastName);
+                        updateStmt.setString(3, emailId);
+
+                        int rowsUpdated = updateStmt.executeUpdate();
+                        return "Employee updated successfully: " + firstName + " " + lastName;
+                    }
                 } else {
                     return "No employee found with email: " + emailId;
                 }
