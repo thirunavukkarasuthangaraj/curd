@@ -3,7 +3,10 @@ name: Deploy UI to S3
 on:
   push:
     branches:
-      - main  # Change if using a different branch
+      - main
+    paths:
+      - 'angular-frontend/**'  # Trigger only if UI files change
+  workflow_dispatch:  # Allows manual execution
 
 jobs:
   deploy-ui:
