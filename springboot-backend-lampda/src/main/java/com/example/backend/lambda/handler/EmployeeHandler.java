@@ -10,7 +10,7 @@ public class EmployeeHandler implements RequestHandler<Map<String, String>, Stri
     public String handleRequest(Map<String, String> input, Context context) {
         System.out.println("Received input: " + input); // Log the input to CloudWatch
 
-        // Extract data
+        // Extract data 
         String firstName = input.get("firstName");
         String lastName = input.get("lastName");
         String emailId = input.get("emailId");
