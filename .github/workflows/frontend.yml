@@ -1,4 +1,4 @@
-name: Deploy Spring Boot Lambda to AWS
+name: Deploy Angular Build
 
 on:
   push:
