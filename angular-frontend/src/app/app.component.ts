@@ -7,7 +7,7 @@ import pakageJson from '../../package.json';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Angular + Spring Boot CRUD Full Stack App';
+  title = 'Thiru fullstack development and AWS deployment Learning';
   public versions:any=pakageJson.version;
 
   }
