@@ -1,4 +1,4 @@
-name: Deploy UI to S3
+name: Deploy UI as Docker Container
 
 on:
   push:
@@ -13,48 +13,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Enable Debug Mode
-        run: echo "Running with debug mode enabled"
-        
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Debug directory structure
-        run: ls -l
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16  # Adjust version if needed
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Debug NPM and Node Versions
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          ECR_REPOSITORY: angular-frontend
+          IMAGE_TAG: latest
         run: |
-          node -v
-          npm -v
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./angular-frontend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Install dependencies
-        run: |
-          cd angular-frontend
-          npm install
-
-      - name: Build Angular App
-        run: |
-          cd angular-frontend
-          npm run build --prod
-
-      - name: Verify Build Output
-        run: ls -l angular-frontend/dist/
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # Change to your AWS region
-
-      - name: Upload to S3
-        run: |
-          aws s3 sync angular-frontend/dist/angular-frontend s3://ui-thiru --delete
-
-      - name: Verify S3 Upload
-        run: aws s3 ls s3://ui-thiru --recursive
+      - name: Deploy to AWS ECS
+        run: echo "Deploying to ECS - Add your deployment script here"
