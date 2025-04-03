@@ -1,6 +1,6 @@
 {
   "name": "angular-frontend",
-  "version": "0.0.5-docker test",
+  "version": "0.0.6-docker test",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
