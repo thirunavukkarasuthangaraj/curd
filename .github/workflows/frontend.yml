@@ -27,12 +27,13 @@ jobs:
 
     - name: Build, tag, and push Docker image to Amazon ECR
       env:
-        ECR_REGISTRY: 431003481885.dkr.ecr.us-east-1.amazonaws.com
-        IMAGE_NAME: angular-frontend
-      run: |
-        docker build -t $IMAGE_NAME .
-        docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
-        docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+    ECR_REGISTRY: 431003481885.dkr.ecr.us-east-1.amazonaws.com
+    IMAGE_NAME: angular-frontend
+  run: |
+    docker build -t $IMAGE_NAME -f angular-frontend/Dockerfile angular-frontend
+    docker tag $IMAGE_NAME:latest $ECR_REGISTRY/$IMAGE_NAME:latest
+    docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+
 
     - name: Update ECS service to deploy new image
       run: |
