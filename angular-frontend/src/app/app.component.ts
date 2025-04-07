@@ -7,7 +7,7 @@ import pakageJson from '../../package.json';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Thiru fullstack development and AWS deployment Learning';
   public versions:any=pakageJson.version;
+  title = 'Thiru Fullstack Development & AWS Deployment Docker - '+pakageJson.version;
 
   }

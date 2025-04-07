@@ -1,6 +1,6 @@
 {
   "name": "angular-frontend",
-  "version": "0.0.7-docker",
+  "version": "0.0.8-docker",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
