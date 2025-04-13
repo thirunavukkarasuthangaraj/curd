@@ -20,7 +20,7 @@ import net.javaguides.springboot.model.Employee;
 import net.javaguides.springboot.repository.EmployeeRepository;
 
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/api/v1/")
 public class EmployeeController {
 
 	@Autowired
