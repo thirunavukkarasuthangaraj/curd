@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main  # Change to your branch if different
+    paths:
+      - "angular-frontend/**"
 
 jobs:
   deploy:
