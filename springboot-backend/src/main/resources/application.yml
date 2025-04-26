@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: employee-kafka-app
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: employee-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+      bindings:
+        employeeAdd-outbound:
+          destination: topic/employee-add
+          content-type: application/json
+          producer:
+            required-groups: employee-group
+        employeeUpdate-outbound:
+          destination: topic/employee-update
+          content-type: application/json
+          producer:
+            required-groups: employee-group
+        employeeAdd-inbound:
+          destination: topic/employee-add
+          group: employee-group
+          content-type: application/json
+        employeeUpdate-inbound:
+          destination: topic/employee-update
+          group: employee-group
+          content-type: application/json
