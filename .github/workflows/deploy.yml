@@ -13,26 +13,36 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: SSH to EC2 and Deploy
+    - name: SSH and Deploy to EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         script: |
+          # Go inside project folder
           cd /home/ec2-user/curd
+          
+          # -------------------------------
+          # 🛜 Create SWAP MEMORY for build
+          # -------------------------------
+          sudo fallocate -l 2G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          sudo swapon --show
+    
+          # -------------------------------
+          # 📦 Pull latest code + Build
+          # -------------------------------
           git pull origin main
-
-          # Build backend jar again
+          
+          # Maven build
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
-
-          # Copy the generated jar
-          cp target/*.jar ../springboot-backend/springboot-backend-0.0.1.jar
-
+    
           cd ..
-
-          # Restart docker-compose
           docker-compose down
           docker-compose build
           docker-compose up -d
+    

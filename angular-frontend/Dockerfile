@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . .
-RUN npm run build --prod
+RUN npm run build 
 
 # Step 2: Serve Angular app with Nginx
 FROM nginx:latest
