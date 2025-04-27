@@ -20,8 +20,15 @@ jobs:
         username: ec2-user
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         script: |
-          cd /home/ec2-user/curd    # ✅ your project folder
-          git pull origin main      # ✅ pull latest code
-          docker-compose down       # ✅ stop old containers
-          docker-compose build      # ✅ rebuild backend + frontend images
-          docker-compose up -d      # ✅ start fresh containers
+          cd /home/ec2-user/curd
+          git pull origin main
+
+          # ✅ Step 1: Build backend jar first
+          cd springboot-backend
+          ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+          cd ..
+
+          # ✅ Step 2: Rebuild docker containers
+          docker-compose down
+          docker-compose build
+          docker-compose up -d
