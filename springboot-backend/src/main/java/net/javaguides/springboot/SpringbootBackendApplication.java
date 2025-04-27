@@ -2,11 +2,8 @@ package net.javaguides.springboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.stream.annotation.EnableBinding;	
-import net.javaguides.springboot.Kafka.KafkaChannels;
+   
  
- 
-@EnableBinding(KafkaChannels.class)
 @SpringBootApplication
 public class SpringbootBackendApplication {
 
