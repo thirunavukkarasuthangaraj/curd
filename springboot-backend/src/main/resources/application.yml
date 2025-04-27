@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/database-1
+    url: jdbc:postgresql://postgres-1:5432/database-1
     username: postgres
-    password: 
+    password: postgres123
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -17,7 +17,7 @@ spring:
         format_sql: true
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka-1:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -29,7 +29,7 @@ spring:
 
   data:
     elasticsearch:
-      uris: http://localhost:9200
+      uris: http://elasticsearch-1:9200
 
 kafka:
   topic:
