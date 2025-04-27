@@ -13,7 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: SSH and Deploy to EC2
+    - name: SSH into EC2 and Deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -22,27 +22,28 @@ jobs:
         script: |
           # Go inside project folder
           cd /home/ec2-user/curd
-          
-          # -------------------------------
-          # 🛜 Create SWAP MEMORY for build
-          # -------------------------------
-          sudo fallocate -l 2G /swapfile
-          sudo chmod 600 /swapfile
-          sudo mkswap /swapfile
-          sudo swapon /swapfile
+
+          # 🛜 Create swap memory if not already created
+          if [ ! -f /swapfile ]; then
+            echo "Creating SWAP memory..."
+            sudo fallocate -l 2G /swapfile
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+          fi
+
+          # 🛜 Display swap info
           sudo swapon --show
-    
-          # -------------------------------
-          # 📦 Pull latest code + Build
-          # -------------------------------
+
+          # 📦 Pull latest code
           git pull origin main
-          
-          # Maven build
+
+          # 📦 Build backend
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
-    
+
+          # 🛠️ Build and Deploy containers
           cd ..
           docker-compose down
           docker-compose build
           docker-compose up -d
-    
