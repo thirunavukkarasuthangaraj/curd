@@ -1,4 +1,4 @@
-name: Deploy Backend and Frontend Using Docker Compose
+name: Deploy Backend, Frontend, Postgres via Docker Compose
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: SSH and Deploy to EC2
+    - name: SSH to EC2 and Deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
@@ -23,14 +23,16 @@ jobs:
           cd /home/ec2-user/curd
           git pull origin main
 
-          # Maven build
+          # Build backend jar again
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
 
-          # ❗ ADD THIS AFTER Maven build
-          cp target/*.jar ../backend.jar
+          # Copy the generated jar
+          cp target/*.jar ../springboot-backend/springboot-backend-0.0.1.jar
 
           cd ..
+
+          # Restart docker-compose
           docker-compose down
           docker-compose build
           docker-compose up -d
