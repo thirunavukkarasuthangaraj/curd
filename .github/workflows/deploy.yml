@@ -23,12 +23,14 @@ jobs:
           cd /home/ec2-user/curd
           git pull origin main
 
-          # ✅ Step 1: Build backend jar first
+          # Maven build
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
-          cd ..
 
-          # ✅ Step 2: Rebuild docker containers
+          # ❗ ADD THIS AFTER Maven build
+          cp target/*.jar ../backend.jar
+
+          cd ..
           docker-compose down
           docker-compose build
           docker-compose up -d
