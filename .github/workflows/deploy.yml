@@ -1,4 +1,4 @@
-name: Deploy Backend, Frontend, Postgres via Docker Compose
+name: Deploy Backend and Frontend Using Docker Compose
 
 on:
   push:
@@ -13,38 +13,29 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: SSH into EC2 and Deploy
-      uses: appleboy/ssh-action@v0.1.6   # ✅ use a specific stable version
+    - name: SSH and Deploy to EC2
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         script: |
-          echo "👉 Connected to EC2"
-
-          # Move into project directory
           cd /home/ec2-user/curd
-
-          # 🛜 Create SWAP MEMORY if not exists (safe mode)
-          sudo fallocate -l 2G /swapfile || true
-          sudo chmod 600 /swapfile || true
-          sudo mkswap /swapfile || true
-          sudo swapon /swapfile || true
-          sudo swapon --show || true
-
-          echo "👉 Swap memory created or already exists."
-
-          # 📦 Pull latest code
           git pull origin main
 
-          # ⚙️ Build backend (Spring Boot)
+          # ✅ Step 1: Backend build (Spring Boot)
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
-
-          # 🐳 Docker Compose
+          cp target/*.jar backend.jar
           cd ..
+
+          # ✅ Step 2: Frontend build (Angular)
+          cd angular-frontend
+          npm install --legacy-peer-deps || true
+          npm run build -- --output-path=dist
+          cd ..
+
+          # ✅ Step 3: Docker
           docker-compose down
           docker-compose build
           docker-compose up -d
-
-          echo "✅ Deployment completed successfully!"
