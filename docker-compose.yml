@@ -58,13 +58,16 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092
       SPRING_DATA_ELASTICSEARCH_URIS: http://elasticsearch-1:9200
 
-  frontend:
-    build: ./angular-frontend
-    container_name: angular-frontend-1
-    ports:
-      - "4200:80"
-    depends_on:
-      - backend
+frontend:
+  build:
+    context: ./angular-frontend
+    dockerfile: Dockerfile
+  container_name: angular-frontend-1
+  ports:
+    - "4200:80"
+  depends_on:
+    - backend
+
 
 networks:
   default:
