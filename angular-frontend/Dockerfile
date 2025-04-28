@@ -14,7 +14,7 @@ RUN npm run build -- --configuration=production --no-progress --build-optimizer
 FROM nginx:alpine
 
 # Replace 'employee-management-app' with your actual built folder name inside dist/
-COPY --from=build /app/dist/employee-management-app /usr/share/nginx/html
+COPY --from=build /app/dist/angular-frontend /usr/share/nginx/html
 
 # If you have nginx.conf, then uncomment
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
