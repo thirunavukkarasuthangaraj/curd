@@ -13,7 +13,7 @@ RUN npm run build -- --configuration=production --no-progress --build-optimizer
 
 FROM nginx:alpine
 
-# ✅ Correct COPY
+# ✅ Correctly copy built files
 COPY --from=build /app/dist/angular-frontend /usr/share/nginx/html
 
 EXPOSE 80

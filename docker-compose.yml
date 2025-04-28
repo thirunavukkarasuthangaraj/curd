@@ -66,13 +66,12 @@ services:
       SPRING_DATA_ELASTICSEARCH_URIS: http://elasticsearch-1:9200
 
   frontend:
-    image: nginx:alpine
+    build:
+      context: ./angular-frontend
     container_name: angular-frontend-1
     restart: always
     ports:
       - "4200:80"
-    volumes:
-      - ./angular-frontend/dist:/usr/share/nginx/html
     depends_on:
       - backend
 
