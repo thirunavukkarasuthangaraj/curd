@@ -19,34 +19,33 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ec2-user
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        port: 22
+        command_timeout: 30m
         script: |
           cd /home/ec2-user/curd
           git pull origin main
 
-          # Step 0: Create swap memory (safe even if exists)
+          # Swap Memory Create
           sudo fallocate -l 2G /swapfile || true
           sudo chmod 600 /swapfile || true
           sudo mkswap /swapfile || true
           sudo swapon /swapfile || true
           sudo swapon --show
 
-          # Check memory and disk
-          df -h
-          free -h
-
-          # Step 1: Build Backend
+          # Build Backend
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
-          cp target/*.jar backend.jar
+          cp target/springboot-backend-0.0.1.jar backend.jar
           cd ..
 
-          # Step 2: Build Frontend (outside Docker)
+          # Build Frontend
           cd angular-frontend
+          export NODE_OPTIONS=--openssl-legacy-provider
           npm install --legacy-peer-deps || { echo "❌ npm install failed"; exit 1; }
-          npm run build -- --configuration=production --no-progress --build-optimizer || { echo "❌ Angular build failed"; exit 1; }
+          npm run build -- --configuration=development || { echo "❌ Angular build failed"; exit 1; }
           cd ..
 
-          # Step 3: Docker Compose up
+          # Docker Compose Up
           docker-compose down
           docker-compose build backend
           docker-compose up -d

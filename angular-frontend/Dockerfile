@@ -7,6 +7,8 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 RUN npm run build -- --configuration=production --no-progress --build-optimizer
 
 FROM nginx:alpine
