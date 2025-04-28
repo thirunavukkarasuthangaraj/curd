@@ -32,10 +32,9 @@ jobs:
           sudo swapon /swapfile || true
           sudo swapon --show
 
-          # Build Backend
+          # Build Backend (no copy needed)
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
-          cp target/springboot-backend-0.0.1.jar backend.jar
           cd ..
 
           # Build Frontend
