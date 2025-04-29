@@ -78,6 +78,8 @@ services:
       - "80:80"
     depends_on:
       - backend
+    volumes:
+    - /etc/letsencrypt:/etc/letsencrypt:ro
 
 volumes:
   pgdata:
