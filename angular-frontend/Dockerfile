@@ -16,6 +16,8 @@ FROM nginx:alpine
 # Copy Angular dist build
 COPY --from=build /app/dist/angular-frontend /usr/share/nginx/html
 
+
+
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
