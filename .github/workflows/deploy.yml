@@ -13,13 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-
     - name: SSH and Deploy to EC2
       uses: appleboy/ssh-action@v0.1.7
       with:
@@ -42,27 +35,17 @@ jobs:
           # Build Backend
           cd springboot-backend
           ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+          cp target/springboot-backend-0.0.1.jar backend.jar
           cd ..
 
           # Build Frontend
           cd angular-frontend
           export NODE_OPTIONS=--openssl-legacy-provider
           npm install --legacy-peer-deps || { echo "❌ npm install failed"; exit 1; }
-          npm run build -- --configuration=production || { echo "❌ Angular build failed"; exit 1; }
+          npm run build -- --configuration=development || { echo "❌ Angular build failed"; exit 1; }
           cd ..
 
-          # Docker Compose
+          # Docker Compose Up
           docker-compose down
-          docker-compose build
+          docker-compose build backend
           docker-compose up -d
-
-          # ECR Login
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 431003481885.dkr.ecr.us-east-1.amazonaws.com
-
-          # Tag and Push Backend Image to ECR
-          docker tag curd-backend:latest 431003481885.dkr.ecr.us-east-1.amazonaws.com/curd-backend:latest
-          docker push 431003481885.dkr.ecr.us-east-1.amazonaws.com/curd-backend:latest
-
-          # Tag and Push Frontend Image to ECR
-          docker tag curd-frontend:latest 431003481885.dkr.ecr.us-east-1.amazonaws.com/curd-frontend:latest
-          docker push 431003481885.dkr.ecr.us-east-1.amazonaws.com/curd-frontend:latest

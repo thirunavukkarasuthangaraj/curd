@@ -8,6 +8,6 @@ import pakageJson from '../../package.json';
 })
 export class AppComponent {
   public versions:any=pakageJson.version;
-  title = 'Thiru Fullstack Development & AWS Deployment Docker - '+pakageJson.version;
-
+  title = 'Demo Fullstack  & AWS Deployment Docker - '+pakageJson.version;
+  
   }
