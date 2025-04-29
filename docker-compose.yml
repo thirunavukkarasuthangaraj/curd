@@ -75,14 +75,11 @@ services:
     container_name: angular-frontend-1
     restart: always
     ports:
-      - "4200:80"
+      - "80:80"
     depends_on:
       - backend
-    volumes:
-      - frontend-data:/usr/share/nginx/html
 
 volumes:
   pgdata:
   esdata:
   backend-data:
-  frontend-data:
