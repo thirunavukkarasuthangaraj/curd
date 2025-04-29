@@ -1,6 +1,6 @@
 {
   "name": "angular-frontend",
-  "version": "V.0.0.14 Deployee",
+  "version": "V.0.0.15 Deployee",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
