@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15
@@ -85,5 +83,6 @@ services:
 
 volumes:
   pgdata:
+  esdata:
   backend-data:
   frontend-data:
