@@ -77,7 +77,7 @@ services:
     container_name: angular-frontend-1
     restart: always
     ports:
-      - "4200:80"
+      - "80:80"
     depends_on:
       - backend
     volumes:
