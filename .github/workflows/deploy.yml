@@ -22,28 +22,35 @@ jobs:
         port: 22
         command_timeout: 30m
         script: |
+          # Clone repo if not present
+          if [ ! -d "/home/ubuntu/curd/.git" ]; then
+            git clone https://github.com/thirunavukkarasuthangaraj/curd.git /home/ubuntu/curd
+          else
+            cd /home/ubuntu/curd
+            git pull origin main
+          fi
+
           cd /home/ubuntu/curd
-          git pull origin main
 
-          # Optional: Add swap memory (useful for builds)
-          sudo fallocate -l 2G /swapfile || true
-          sudo chmod 600 /swapfile || true
-          sudo mkswap /swapfile || true
-          sudo swapon /swapfile || true
-          sudo swapon --show
+          # Setup swap only if not active
+          if ! swapon --show | grep -q "/swapfile"; then
+            sudo fallocate -l 2G /swapfile || true
+            sudo chmod 600 /swapfile || true
+            sudo mkswap /swapfile || true
+            sudo swapon /swapfile || true
+          fi
+          swapon --show
 
-          # Build Backend JAR
-          cd springboot-backend
-          ./mvnw clean package -DskipTests || mvn clean package -DskipTests
-          cp target/springboot-backend-0.0.1.jar backend.jar
-          cd ..
+          # Install Docker Compose if missing
+          if ! command -v docker-compose &> /dev/null; then
+            sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
 
-          # Clean old unused Docker images (optional but helpful)
-          docker image prune -af || true
+          # Clean old Docker images
+          sudo docker image prune -af || true
 
-          # Rebuild BOTH backend and frontend Docker images
-          docker-compose build backend frontend
-
-          # Restart all containers
-          docker-compose down
-          docker-compose up -d
+          # Start app using docker-compose
+          sudo docker-compose down || true
+          sudo docker-compose build
+          sudo docker-compose up -d
